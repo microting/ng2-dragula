@@ -48,7 +48,7 @@
             "@types/jest": "^29.5.2",
             "@types/node": "^18.7.1",
             "@typescript-eslint/eslint-plugin": "^6.13.2",
-            "@typescript-eslint/parser": "^6.13.2",
+            "@typescript-eslint/parser": "^8.23.0",
             "codecov": "^3.8.2",
             "conventional-changelog-cli": "^2.1.1",
             "conventional-github-releaser": "^3.1.5",
