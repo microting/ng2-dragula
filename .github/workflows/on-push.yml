@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - run: yarn install
       - run: |
           npx nx build demo --configuration production
 
@@ -21,7 +21,7 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - run: yarn install
       - run: npx nx run-many --target=test --all --code-coverage
         continue-on-error: true
 
@@ -31,5 +31,5 @@ jobs:
     needs: build
     steps:
       - uses: actions/checkout@v3
-      - run: npm i
+      - run: yarn install
       - run: npm run lint

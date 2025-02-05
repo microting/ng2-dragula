@@ -45,3 +45,4 @@ Thumbs.db
 # AoT generated files
 factories
 migrations.json
+.nx
