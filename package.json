@@ -42,7 +42,7 @@
     "@nx/eslint-plugin": "16.5.2",
     "@nx/jest": "16.5.0",
     "@nx/linter": "16.5.2",
-    "@schematics/angular": "16.1.4",
+    "@schematics/angular": "19.1.5",
     "@types/dragula": "^2.1.34",
     "@types/fs-extra": "11.0.4",
     "@types/jest": "29.5.2",
