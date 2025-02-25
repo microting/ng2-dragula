@@ -58,7 +58,7 @@
     "eslint-plugin-cypress": "^2.12.1",
     "fs-extra": "^11.3.0",
     "jest": "^29.6.1",
-    "jest-preset-angular": "^13.1.1",
+    "jest-preset-angular": "^14.5.3",
     "ng-packagr": "^19.0.0",
     "nx-cloud": "^19.0.0",
     "prettier": "^2.5.1",
