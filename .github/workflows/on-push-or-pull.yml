@@ -68,7 +68,7 @@ jobs:
           
           # Run Cypress tests
           echo "Running Cypress tests..."
-          npx cypress run --config baseUrl=http://localhost:4200 --spec "apps/demo-e2e/src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
+          npx cypress run --config-file apps/demo-e2e/cypress.config.ts --config baseUrl=http://localhost:4200 --spec "apps/demo-e2e/src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
           
           # Capture server logs
           echo "=== Capturing server logs ==="
