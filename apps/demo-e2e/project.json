@@ -22,13 +22,6 @@
           "headless": true
         }
       }
-    },
-    "lint": {
-      "executor": "@nx/eslint:lint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["apps/demo-e2e/**/*.{js,ts}"]
-      }
     }
   },
   "tags": [],
