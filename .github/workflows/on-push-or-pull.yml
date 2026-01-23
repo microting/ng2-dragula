@@ -44,6 +44,11 @@ jobs:
       - run: npx cypress install
       - name: Run Cypress e2e tests with logging
         run: |
+          # Create log directories
+          mkdir -p dist/cypress/apps/demo-e2e/logs
+          mkdir -p dist/cypress/apps/demo-e2e/screenshots
+          mkdir -p dist/cypress/apps/demo-e2e/videos
+          
           # Start the dev server in background and capture logs
           npx nx serve demo --port 4200 > demo-server.log 2>&1 &
           SERVER_PID=$!
@@ -76,8 +81,12 @@ jobs:
           wait $SERVER_PID 2>/dev/null || true
           
           # Save server logs to dist for artifact upload
-          mkdir -p dist/cypress/apps/demo-e2e/logs
-          cp demo-server.log dist/cypress/apps/demo-e2e/logs/ || true
+          if [ -f demo-server.log ]; then
+            cp demo-server.log dist/cypress/apps/demo-e2e/logs/
+            echo "Server logs saved"
+          else
+            echo "Warning: demo-server.log not found"
+          fi
           
           # Exit with Cypress exit code
           exit ${TEST_EXIT_CODE:-0}
