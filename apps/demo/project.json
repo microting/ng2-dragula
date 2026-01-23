@@ -57,13 +57,11 @@
     "serve": {
       "executor": "@angular-devkit/build-angular:dev-server",
       "options": {
-        "buildTarget": "demo:build",
-        "browserTarget": "demo:build"
+        "buildTarget": "demo:build"
       },
       "configurations": {
         "production": {
-          "buildTarget": "demo:build:production",
-          "browserTarget": "demo:build:production"
+          "buildTarget": "demo:build:production"
         }
       }
     },
