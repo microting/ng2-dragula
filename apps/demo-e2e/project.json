@@ -16,7 +16,7 @@
           "devServerTarget": "demo:serve:production"
         },
         "ci": {
-          "devServerTarget": "demo:serve-static",
+          "devServerTarget": "demo:serve",
           "record": false,
           "browser": "chrome",
           "headless": true

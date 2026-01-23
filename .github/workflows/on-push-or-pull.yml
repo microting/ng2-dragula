@@ -43,4 +43,3 @@ jobs:
       - run: yarn install
       - run: npx cypress install
       - run: npx nx e2e demo-e2e --configuration=ci
-        continue-on-error: true

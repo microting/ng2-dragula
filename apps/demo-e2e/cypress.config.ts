@@ -10,7 +10,7 @@ export default defineConfig({
         default: 'nx run demo:serve',
         production: 'nx run demo:serve:production',
       },
-      ciWebServerCommand: 'nx run demo:serve-static',
+      ciWebServerCommand: 'nx run demo:serve',
     }),
     baseUrl: 'http://localhost:4200',
     specPattern: 'src/e2e/**/*.cy.{js,jsx,ts,tsx}',
