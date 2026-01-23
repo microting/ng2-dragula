@@ -12,7 +12,11 @@
     "test": "nx run-many --target=test --all",
     "version": "nx run ng2-dragula:version",
     "pretest": "run-s lint build",
-    "test-coverage": "nx run-many --all --target=test --codeCoverage"
+    "test-coverage": "nx run-many --all --target=test --codeCoverage",
+    "cypress:open": "cypress open",
+    "cypress:run": "cypress run",
+    "e2e": "nx e2e demo-e2e",
+    "e2e:ci": "nx e2e demo-e2e --configuration=ci"
   },
   "dependencies": {
     "@angular/animations": "^19.1.4",
@@ -39,6 +43,7 @@
     "@angular-eslint/template-parser": "^19.0.0",
     "@angular/cli": "^19.1.5",
     "@angular/compiler-cli": "^19.1.4",
+    "@nx/cypress": "22.4.1",
     "@nx/eslint-plugin": "^19.0.0",
     "@nx/jest": "^19.0.0",
     "@nx/linter": "^19.0.0",
@@ -52,6 +57,7 @@
     "codecov": "^3.8.2",
     "conventional-changelog-cli": "^2.1.1",
     "conventional-github-releaser": "^3.1.5",
+    "cypress": "15.9.0",
     "dragula": "^3.7.2",
     "eslint": "^8.15.0",
     "eslint-config-prettier": "^9.0.0",
