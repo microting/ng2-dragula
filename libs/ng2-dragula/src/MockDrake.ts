@@ -65,6 +65,14 @@ export class MockDrake implements DrakeWithModels {
           return;
         }
 
+        if (eventType === EventTypes.DragEnd) {
+          const argument = Array.from(args);
+          const el = argument[0];
+          //@ts-ignore
+          callback(el);
+          return;
+        }
+
         if (eventType === EventTypes.Drop) {
           const argument = Array.from(args);
           const el = argument[0];
@@ -76,7 +84,21 @@ export class MockDrake implements DrakeWithModels {
           return;
         }
 
-        if (eventType === EventTypes.Remove) {
+        if (eventType === EventTypes.Cloned) {
+          const argument = Array.from(args);
+          const clone = argument[0];
+          const original = argument[1];
+          const type = argument[2];
+          //@ts-ignore
+          callback(clone, original, type);
+          return;
+        }
+
+        if (eventType === EventTypes.Cancel || 
+            eventType === EventTypes.Remove || 
+            eventType === EventTypes.Shadow ||
+            eventType === EventTypes.Over ||
+            eventType === EventTypes.Out) {
           const argument = Array.from(args);
           const el = argument[0];
           const container = argument[1];
