@@ -49,12 +49,8 @@ jobs:
           mkdir -p dist/cypress/apps/demo-e2e/screenshots
           mkdir -p dist/cypress/apps/demo-e2e/videos
           
-          # Build the library first (required for demo app)
-          echo "Building ng2-dragula library..."
-          npx nx build ng2-dragula
-          echo "Library build complete"
-          
           # Start the dev server in background and capture logs
+          # Note: Library will be compiled from source by Angular dev server
           npx nx serve demo --port 4200 > demo-server.log 2>&1 &
           SERVER_PID=$!
           echo "Server started with PID: $SERVER_PID"
