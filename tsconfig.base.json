@@ -24,7 +24,7 @@
     "baseUrl": ".",
     "paths": {
       "ng2-dragula": [
-        "libs/ng2-dragula/src/public_api.ts"
+        "dist/ng2-dragula"
       ]
     }
   },
