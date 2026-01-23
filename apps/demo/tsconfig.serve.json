@@ -6,9 +6,10 @@
     "forceConsistentCasingInFileNames": true,
     "target": "ES2022",
     "useDefineForClassFields": false,
+    "moduleResolution": "node",
     "paths": {
       "ng2-dragula": [
-        "../../dist/ng2-dragula"
+        "../../dist/ng2-dragula/index"
       ]
     }
   },
