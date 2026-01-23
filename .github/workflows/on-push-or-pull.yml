@@ -138,3 +138,36 @@ jobs:
             dist/cypress/apps/demo-e2e/**/*.json
           if-no-files-found: ignore
           retention-days: 7
+      
+      # Print logs to console for easier debugging
+      - name: Print logs to console
+        if: always()
+        run: |
+          echo "========================================"
+          echo "=== DEMO SERVER LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/demo-server.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/demo-server.log
+          else
+            echo "No demo-server.log found"
+          fi
+          
+          echo ""
+          echo "========================================"
+          echo "=== BROWSER CONSOLE LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/browser-console.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/browser-console.log
+          else
+            echo "No browser-console.log found"
+          fi
+          
+          echo ""
+          echo "========================================"
+          echo "=== TEST EXECUTION LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/test-execution.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/test-execution.log
+          else
+            echo "No test-execution.log found"
+          fi
