@@ -1,17 +1,7 @@
 import { defineConfig } from 'cypress';
-import { nxE2EPreset } from '@nx/cypress/plugins/cypress-preset';
 
 export default defineConfig({
   e2e: {
-    ...nxE2EPreset(__filename, {
-      cypressDir: 'src',
-      bundler: 'vite',
-      webServerCommands: {
-        default: 'nx run demo:serve',
-        production: 'nx run demo:serve:production',
-      },
-      ciWebServerCommand: 'nx run demo:serve',
-    }),
     baseUrl: 'http://localhost:4200',
     specPattern: 'src/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'src/support/e2e.ts',
