@@ -47,7 +47,7 @@ jobs:
       
       # Upload screenshots on failure
       - name: Upload Cypress screenshots
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-screenshots
@@ -57,7 +57,7 @@ jobs:
       
       # Upload videos
       - name: Upload Cypress videos
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-videos
@@ -67,7 +67,7 @@ jobs:
       
       # Upload Cypress logs
       - name: Upload Cypress logs
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         if: always()
         with:
           name: cypress-logs
