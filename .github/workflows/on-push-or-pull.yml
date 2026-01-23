@@ -42,8 +42,45 @@ jobs:
       - uses: actions/checkout@v3
       - run: yarn install
       - run: npx cypress install
-      - name: Run Cypress e2e tests
-        run: npx nx e2e demo-e2e --configuration=ci
+      - name: Run Cypress e2e tests with logging
+        run: |
+          # Start the dev server in background and capture logs
+          npx nx serve demo --port 4200 > demo-server.log 2>&1 &
+          SERVER_PID=$!
+          echo "Server started with PID: $SERVER_PID"
+          
+          # Wait for server to be ready
+          echo "Waiting for server to be ready..."
+          for i in {1..60}; do
+            if curl -s http://localhost:4200 > /dev/null; then
+              echo "Server is ready after $i seconds"
+              break
+            fi
+            if [ $i -eq 60 ]; then
+              echo "Server failed to start within 60 seconds"
+              echo "=== Server logs ==="
+              cat demo-server.log
+              kill $SERVER_PID 2>/dev/null || true
+              exit 1
+            fi
+            sleep 1
+          done
+          
+          # Run Cypress tests
+          echo "Running Cypress tests..."
+          npx cypress run --config baseUrl=http://localhost:4200 --spec "apps/demo-e2e/src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
+          
+          # Capture server logs
+          echo "=== Capturing server logs ==="
+          kill $SERVER_PID 2>/dev/null || true
+          wait $SERVER_PID 2>/dev/null || true
+          
+          # Save server logs to dist for artifact upload
+          mkdir -p dist/cypress/apps/demo-e2e/logs
+          cp demo-server.log dist/cypress/apps/demo-e2e/logs/ || true
+          
+          # Exit with Cypress exit code
+          exit ${TEST_EXIT_CODE:-0}
       
       # Upload screenshots on failure
       - name: Upload Cypress screenshots
