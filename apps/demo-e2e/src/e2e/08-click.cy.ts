@@ -9,7 +9,7 @@ describe('Drag & Drop - Click vs Drag', () => {
   });
 
   it('should render click example with dragula containers', () => {
-    cy.get('ex-08-click [dragula="CLICKABLE"]').first().as('clickContainer');
+    cy.get('ex-08-click [dragula="CLICKS"]').first().as('clickContainer');
     
     // Verify container exists and has items
     cy.get('@clickContainer').find('div').should('have.length.greaterThan', 0);
@@ -23,8 +23,8 @@ describe('Drag & Drop - Click vs Drag', () => {
   });
 
   it('should have multiple containers for click example', () => {
-    cy.get('ex-08-click [dragula="CLICKABLE"]').first().as('source');
-    cy.get('ex-08-click [dragula="CLICKABLE"]').eq(1).as('target');
+    cy.get('ex-08-click [dragula="CLICKS"]').first().as('source');
+    cy.get('ex-08-click [dragula="CLICKS"]').eq(1).as('target');
     
     // Verify both containers exist
     cy.get('@source').should('exist');

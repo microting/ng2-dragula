@@ -9,8 +9,8 @@ describe('Drag & Drop - Copy with Model', () => {
   });
 
   it('should render copy-model example with dragula containers', () => {
-    cy.get('ex-06-copy-model [dragula="COPY_MODEL"]').first().as('modelSource');
-    cy.get('ex-06-copy-model [dragula="COPY_MODEL"]').eq(1).as('modelTarget');
+    cy.get('ex-06-copy-model [dragula="PERSON"]').first().as('modelSource');
+    cy.get('ex-06-copy-model [dragula="PERSON"]').eq(1).as('modelTarget');
     
     // Verify containers exist and have items
     cy.get('@modelSource').find('div').should('have.length.greaterThan', 0);

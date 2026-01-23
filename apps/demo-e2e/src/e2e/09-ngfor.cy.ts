@@ -9,8 +9,8 @@ describe('Drag & Drop - ngFor Integration', () => {
   });
 
   it('should render ngFor example with dynamically rendered lists', () => {
-    cy.get('ex-09-ngfor [dragula="NGFOR"]').first().as('ngForSource');
-    cy.get('ex-09-ngfor [dragula="NGFOR"]').eq(1).as('ngForTarget');
+    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').first().as('ngForSource');
+    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').eq(1).as('ngForTarget');
     
     // ngFor lists should be rendered with items
     cy.get('@ngForSource').find('div').should('have.length.greaterThan', 0);
@@ -21,7 +21,7 @@ describe('Drag & Drop - ngFor Integration', () => {
   });
 
   it('should maintain ngFor list structure', () => {
-    cy.get('ex-09-ngfor [dragula="NGFOR"]').first().as('list');
+    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').first().as('list');
     
     // Verify list has items and structure is intact
     cy.get('@list').find('div').its('length').then((initialCount) => {

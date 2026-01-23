@@ -9,7 +9,7 @@ describe('Drag & Drop - Spill', () => {
   });
 
   it('should render spill example with dragula containers', () => {
-    cy.get('ex-03-spill [dragula="VAMPIRES"]').first().as('spillContainer');
+    cy.get('ex-03-spill [dragula="SPILL"]').first().as('spillContainer');
     
     // Verify container exists and has items
     cy.get('@spillContainer').find('div').should('have.length.greaterThan', 0);

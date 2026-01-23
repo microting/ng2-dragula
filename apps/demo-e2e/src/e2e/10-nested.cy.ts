@@ -10,7 +10,7 @@ describe('Drag & Drop - Nested Containers', () => {
 
   it('should render nested example with dragula containers', () => {
     // Find nested containers in the example
-    cy.get('ex-10-nested [dragula="NESTED"]').first().as('parentContainer');
+    cy.get('ex-10-nested [dragula="COLUMNS"]').first().as('parentContainer');
     
     // Nested containers exist - verify they render
     cy.get('@parentContainer').should('exist');
@@ -18,7 +18,7 @@ describe('Drag & Drop - Nested Containers', () => {
   });
 
   it('should have multiple nested containers', () => {
-    cy.get('ex-10-nested [dragula="NESTED"]').as('containers');
+    cy.get('ex-10-nested [dragula="COLUMNS"]').as('containers');
     
     // Verify multiple nested containers exist
     cy.get('@containers').should('have.length.greaterThan', 0);
@@ -28,12 +28,12 @@ describe('Drag & Drop - Nested Containers', () => {
   });
 
   it('should maintain nested container structure', () => {
-    cy.get('ex-10-nested [dragula="NESTED"]').its('length').then((containerCount) => {
+    cy.get('ex-10-nested [dragula="COLUMNS"]').its('length').then((containerCount) => {
       // Verify container count is stable
-      cy.get('ex-10-nested [dragula="NESTED"]').should('have.length', containerCount);
+      cy.get('ex-10-nested [dragula="COLUMNS"]').should('have.length', containerCount);
       
       // Verify nested structure remains intact
-      cy.get('ex-10-nested [dragula="NESTED"]').first().should('be.visible');
+      cy.get('ex-10-nested [dragula="COLUMNS"]').first().should('be.visible');
     });
   });
 });

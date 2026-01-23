@@ -34,8 +34,8 @@ describe('Demo App - Basic', () => {
     
     cy.screenshot('03-ex-app-exists');
     
-    cy.get('h1').should('contain', 'angular-dragula').then(($el) => {
-      cy.task('log', `Found h1 with text: ${$el.text()}`);
+    cy.get('h1 img[alt="angular-dragula"]').should('exist').then(($el) => {
+      cy.task('log', `Found h1 with logo image alt="${$el.attr('alt')}"`);
     });
     
     cy.screenshot('04-h1-checked');
