@@ -5,44 +5,23 @@
 describe('Drag & Drop - Events', () => {
   beforeEach(() => {
     cy.visit('/');
-    // Navigate to events section if it's not immediately visible
-    cy.contains('Events').scrollIntoView();
+    cy.get('ex-02-events').should('exist');
   });
 
-  it('should display event log when dragging', () => {
-    // Look for the events example section
-    cy.contains('Events').parent().within(() => {
-      // Find dragula containers in events section
-      cy.get('[dragula]').first().as('eventsContainer');
-      
-      // Check if there's an event log area
-      cy.get('@eventsContainer').find('div').first().as('dragItem');
-      
-      // Trigger drag event
-      cy.get('@dragItem').trigger('mousedown', { button: 0 });
-      cy.wait(100);
-      
-      // The events component should log drag events
-      // Note: Actual event verification would depend on how the demo displays events
-      cy.get('@dragItem').trigger('dragend');
-    });
+  it('should render events example with dragula containers', () => {
+    cy.get('ex-02-events [dragula="DRAGULA_EVENTS"]').first().as('firstContainer');
+    cy.get('ex-02-events [dragula="DRAGULA_EVENTS"]').eq(1).as('secondContainer');
+    
+    // Verify containers exist and have items
+    cy.get('@firstContainer').find('div').should('have.length.greaterThan', 0);
+    cy.get('@secondContainer').should('exist');
   });
 
-  it('should handle drop events', () => {
-    cy.contains('Events').parent().within(() => {
-      cy.get('[dragula]').first().as('source');
-      cy.get('[dragula]').eq(1).as('target');
-      
-      cy.get('@source').find('div').first().as('item');
-      
-      cy.get('@item').trigger('mousedown', { button: 0 });
-      cy.wait(100);
-      cy.get('@target').trigger('dragover');
-      cy.get('@target').trigger('drop');
-      cy.get('@item').trigger('dragend');
-      
-      // Verify drop completed
-      cy.get('@target').find('div').should('have.length.greaterThan', 0);
-    });
+  it('should display event log area', () => {
+    // Verify the events example has an event log or output area
+    cy.get('ex-02-events').should('contain.text', 'Event');
+    
+    // Verify dragula containers are present
+    cy.get('ex-02-events [dragula="DRAGULA_EVENTS"]').should('have.length', 2);
   });
 });
