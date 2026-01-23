@@ -7,7 +7,8 @@ import { DragulaDirective } from '../components/dragula.directive';
   template: `
   <div #host [dragula]="group" [dragulaModel]="model" (dragulaModelChange)="modelChange($event)">
   </div>
-  `
+  `,
+  standalone: false // eslint-disable-line @angular-eslint/prefer-standalone
 })
 
 export class TestHostComponent {
@@ -26,7 +27,8 @@ export class TestHostComponent {
   template: `
   <div #host [dragula]="group" [(dragulaModel)]="model">
   </div>
-  `
+  `,
+  standalone: false // eslint-disable-line @angular-eslint/prefer-standalone
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class TwoWay extends TestHostComponent { }
@@ -35,7 +37,8 @@ export class TwoWay extends TestHostComponent { }
   template: `
   <div #host [dragula]="group" [dragulaModel]="model$|async" (dragulaModelChange)="model$.next($event)" >
   </div>
-  `
+  `,
+  standalone: false // eslint-disable-line @angular-eslint/prefer-standalone
 })
 // eslint-disable-next-line @angular-eslint/component-class-suffix
 export class Asynchronous extends TestHostComponent {
