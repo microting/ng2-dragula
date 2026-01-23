@@ -60,23 +60,28 @@ jobs:
           SERVER_PID=$!
           echo "Server started with PID: $SERVER_PID"
           
-          # Wait for server to be ready (check for 200 response)
-          echo "Waiting for server to be ready..."
-          for i in {1..120}; do
+          # Wait for server to be ready (check for 200 response AND actual HTML content)
+          echo "Waiting for server to be ready with compiled app..."
+          for i in {1..180}; do
             HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 2>/dev/null || echo "000")
-            if [ "$HTTP_CODE" = "200" ]; then
-              echo "Server is ready after $i seconds (HTTP $HTTP_CODE)"
+            CONTENT=$(curl -s http://localhost:4200 2>/dev/null || echo "")
+            
+            # Check if we get HTTP 200 AND the response contains the app tag (not just webpack dev server page)
+            if [ "$HTTP_CODE" = "200" ] && echo "$CONTENT" | grep -q "<ex-app" ; then
+              echo "Server is ready after $i seconds (HTTP $HTTP_CODE, app content found)"
               break
             fi
-            if [ $i -eq 120 ]; then
-              echo "Server failed to return 200 within 120 seconds (last HTTP code: $HTTP_CODE)"
+            if [ $i -eq 180 ]; then
+              echo "Server failed to serve app within 180 seconds"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "Content preview: $(echo "$CONTENT" | head -c 500)"
               echo "=== Server logs ==="
               cat demo-server.log
               kill $SERVER_PID 2>/dev/null || true
               exit 1
             fi
-            if [ $((i % 10)) -eq 0 ]; then
-              echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE)"
+            if [ $((i % 15)) -eq 0 ]; then
+              echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE, content length: ${#CONTENT})"
             fi
             sleep 1
           done
