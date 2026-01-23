@@ -1,6 +1,9 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
+// Collect browser console logs in a buffer for later processing
+let consoleLogs: Array<{type: string; message: string; timestamp: string}> = [];
+
 // Capture all browser console logs
 Cypress.on('window:before:load', (win) => {
   // Store original console methods
@@ -12,95 +15,90 @@ Cypress.on('window:before:load', (win) => {
   
   // Override console methods to capture logs
   win.console.log = function(...args) {
-    cy.task('logBrowserConsole', {
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
       type: 'log',
-      message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '),
+      message,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
     originalLog.apply(win.console, args);
   };
   
   win.console.warn = function(...args) {
-    cy.task('logBrowserConsole', {
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
       type: 'warn',
-      message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '),
+      message,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
     originalWarn.apply(win.console, args);
   };
   
   win.console.error = function(...args) {
-    cy.task('logBrowserConsole', {
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
       type: 'error',
-      message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '),
+      message,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
     originalError.apply(win.console, args);
   };
   
   win.console.info = function(...args) {
-    cy.task('logBrowserConsole', {
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
       type: 'info',
-      message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '),
+      message,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
     originalInfo.apply(win.console, args);
   };
   
   win.console.debug = function(...args) {
-    cy.task('logBrowserConsole', {
+    const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+    consoleLogs.push({
       type: 'debug',
-      message: args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' '),
+      message,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
     originalDebug.apply(win.console, args);
   };
   
   // Capture uncaught errors
   win.addEventListener('error', (event) => {
-    cy.task('logBrowserConsole', {
+    consoleLogs.push({
       type: 'error',
       message: `Uncaught error: ${event.message} at ${event.filename}:${event.lineno}:${event.colno}`,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
   });
   
   // Capture unhandled promise rejections
   win.addEventListener('unhandledrejection', (event) => {
-    cy.task('logBrowserConsole', {
+    consoleLogs.push({
       type: 'error',
       message: `Unhandled promise rejection: ${event.reason}`,
       timestamp: new Date().toISOString()
-    }, { log: false });
+    });
   });
-});
-
-// Add better error logging and debugging
-Cypress.on('fail', (error, runnable) => {
-  // Take screenshot on failure with test name
-  const testName = runnable.fullTitle().replace(/[^a-z0-9]/gi, '_');
-  cy.screenshot(`failed-${testName}`, { capture: 'fullPage' });
-  
-  // Log detailed error information
-  cy.task('log', `Test failed: ${runnable.fullTitle()}`);
-  cy.task('log', `Error: ${error.message}`);
-  cy.task('log', `Stack: ${error.stack}`);
-  
-  // Re-throw the error to fail the test
-  throw error;
 });
 
 // Log test start
 beforeEach(function() {
-  cy.task('log', `Starting test: ${this.currentTest?.fullTitle() || 'unknown'}`);
-  cy.task('log', `========================================`);
+  cy.log(`Starting test: ${this.currentTest?.fullTitle() || 'unknown'}`);
 });
 
-// Log test end
+// Log test end and save console logs
 afterEach(function() {
   const status = this.currentTest?.state || 'unknown';
-  cy.task('log', `========================================`);
-  cy.task('log', `Finished test: ${this.currentTest?.fullTitle() || 'unknown'} - Status: ${status}`);
+  cy.log(`Finished test: ${this.currentTest?.fullTitle() || 'unknown'} - Status: ${status}`);
+  
+  // Save collected console logs to file
+  if (consoleLogs.length > 0) {
+    cy.task('logBrowserConsole', consoleLogs, { log: false }).then(() => {
+      consoleLogs = []; // Clear the buffer
+    });
+  }
   
   // Take a screenshot after each test for debugging (even on pass)
   if (status === 'failed') {

@@ -43,11 +43,15 @@ export default defineConfig({
           console.table(message);
           return null;
         },
-        // Task to log browser console messages
-        logBrowserConsole({ type, message, timestamp }) {
-          const logMessage = `[${timestamp}] [${type.toUpperCase()}] ${message}\n`;
-          console.log(`Browser Console [${type}]:`, message);
-          fs.appendFileSync(browserLogFile, logMessage);
+        // Task to log browser console messages (receives an array of log entries)
+        logBrowserConsole(logs) {
+          if (Array.isArray(logs)) {
+            logs.forEach(({ type, message, timestamp }) => {
+              const logMessage = `[${timestamp}] [${type.toUpperCase()}] ${message}\n`;
+              console.log(`Browser Console [${type}]:`, message);
+              fs.appendFileSync(browserLogFile, logMessage);
+            });
+          }
           return null;
         }
       });
