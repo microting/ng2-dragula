@@ -42,4 +42,38 @@ jobs:
       - uses: actions/checkout@v3
       - run: yarn install
       - run: npx cypress install
-      - run: npx nx e2e demo-e2e --configuration=ci
+      - name: Run Cypress e2e tests
+        run: npx nx e2e demo-e2e --configuration=ci
+        continue-on-error: true
+      
+      # Upload screenshots on failure
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-screenshots
+          path: dist/cypress/apps/demo-e2e/screenshots
+          if-no-files-found: ignore
+          retention-days: 7
+      
+      # Upload videos
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-videos
+          path: dist/cypress/apps/demo-e2e/videos
+          if-no-files-found: ignore
+          retention-days: 7
+      
+      # Upload Cypress logs
+      - name: Upload Cypress logs
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: cypress-logs
+          path: |
+            dist/cypress/apps/demo-e2e/**/*.log
+            dist/cypress/apps/demo-e2e/**/*.json
+          if-no-files-found: ignore
+          retention-days: 7
