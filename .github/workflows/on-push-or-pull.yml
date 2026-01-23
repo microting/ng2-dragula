@@ -55,8 +55,8 @@ jobs:
           echo "Library build complete"
           
           # Start the dev server in background and capture logs
-          # Note: Demo will now use the built library from dist/ng2-dragula
-          npx nx serve demo --port 4200 > demo-server.log 2>&1 &
+          # Note: Using serve-ci target which uses tsconfig.serve.json to import from dist/ng2-dragula
+          npx nx serve-ci demo --port 4200 > demo-server.log 2>&1 &
           SERVER_PID=$!
           echo "Server started with PID: $SERVER_PID"
           

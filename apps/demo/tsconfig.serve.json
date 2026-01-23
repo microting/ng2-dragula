@@ -1,0 +1,10 @@
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "paths": {
+      "ng2-dragula": [
+        "../../dist/ng2-dragula"
+      ]
+    }
+  }
+}
