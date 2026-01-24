@@ -62,8 +62,8 @@ jobs:
           ls -la node_modules/ng2-dragula || echo "Symlink verification failed"
           
           # Start the dev server in background and capture logs
-          # Note: Now using regular serve since ng2-dragula is available in node_modules
-          npx nx serve demo --port 4200 > demo-server.log 2>&1 &
+          # Use serve-ci target which uses tsconfig.serve.json to import from dist
+          npx nx run demo:serve-ci --port 4200 > demo-server.log 2>&1 &
           SERVER_PID=$!
           echo "Server started with PID: $SERVER_PID"
           
