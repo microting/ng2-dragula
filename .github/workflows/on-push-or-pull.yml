@@ -34,82 +34,134 @@ jobs:
       - run: yarn install
       - run: npm run lint
 
-  # run cypress e2e tests
-  e2e_tests:
+  # Step 1: Build and package ng2-dragula library
+  build_package:
     runs-on: ubuntu-latest
     needs: build
     steps:
       - uses: actions/checkout@v3
       - run: yarn install
+      - name: Build ng2-dragula library and create package
+        run: |
+          echo "Building ng2-dragula library..."
+          npx nx build ng2-dragula
+          echo "Library build complete"
+          
+          # Create npm package tarball
+          cd dist/ng2-dragula
+          npm pack
+          cd ../..
+          
+          # Move the tarball to a known location
+          mv dist/ng2-dragula/*.tgz ng2-dragula.tgz
+          echo "Package created: ng2-dragula.tgz"
+          ls -lh ng2-dragula.tgz
+      
+      - name: Upload ng2-dragula package as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ng2-dragula-package
+          path: ng2-dragula.tgz
+          retention-days: 1
+  
+  # Step 2: Build Docker image for demo app
+  build_demo_image:
+    runs-on: ubuntu-latest
+    needs: build_package
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download ng2-dragula package
+        uses: actions/download-artifact@v4
+        with:
+          name: ng2-dragula-package
+      
+      - name: Build Docker image for demo
+        run: |
+          echo "Building Docker image for demo app..."
+          docker build -f apps/demo/Dockerfile -t ng2-dragula-demo:test .
+          echo "Docker image built successfully"
+          
+          # Save the image as a tarball
+          docker save ng2-dragula-demo:test | gzip > demo-image.tar.gz
+          echo "Docker image saved"
+          ls -lh demo-image.tar.gz
+      
+      - name: Upload demo Docker image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-docker-image
+          path: demo-image.tar.gz
+          retention-days: 1
+  
+  # Step 3: Run Cypress e2e tests against Docker container
+  e2e_tests:
+    runs-on: ubuntu-latest
+    needs: build_demo_image
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
       - run: npx cypress install
-      - name: Run Cypress e2e tests with logging
+      
+      - name: Download demo Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-docker-image
+      
+      - name: Load Docker image and start container
+        run: |
+          echo "Loading Docker image..."
+          docker load < demo-image.tar.gz
+          
+          echo "Starting demo container..."
+          docker run -d --name ng2-dragula-demo -p 4200:4200 ng2-dragula-demo:test
+          
+          echo "Waiting for container to be healthy..."
+          sleep 5
+          docker ps
+          
+          # Wait for server to be ready (check for 200 response AND actual HTML content)
+          echo "Waiting for demo app to be ready..."
+          for i in {1..180}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 2>/dev/null || echo "000")
+            CONTENT=$(curl -s http://localhost:4200 2>/dev/null || echo "")
+            
+            # Check if we get HTTP 200 AND the response contains the app tag
+            if [ "$HTTP_CODE" = "200" ] && echo "$CONTENT" | grep -q "<ex-app" ; then
+              echo "Demo app is ready after $i seconds (HTTP $HTTP_CODE)"
+              break
+            fi
+            if [ $i -eq 180 ]; then
+              echo "Demo app failed to start within 180 seconds"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "Content preview: $(echo "$CONTENT" | head -c 500)"
+              echo "=== Container logs ==="
+              docker logs ng2-dragula-demo
+              exit 1
+            fi
+            if [ $((i % 15)) -eq 0 ]; then
+              echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE)"
+            fi
+            sleep 1
+          done
+      
+      - name: Run Cypress e2e tests
         run: |
           # Create log directories
           mkdir -p dist/cypress/apps/demo-e2e/logs
           mkdir -p dist/cypress/apps/demo-e2e/screenshots
           mkdir -p dist/cypress/apps/demo-e2e/videos
           
-          # Build the ng2-dragula library first
-          echo "Building ng2-dragula library..."
-          npx nx build ng2-dragula
-          echo "Library build complete"
-          
-          # Link the built library to node_modules so webpack can resolve it
-          echo "Linking built library to node_modules..."
-          # Create symlink directly (more reliable than npm link in CI)
-          ln -s ../../dist/ng2-dragula node_modules/ng2-dragula
-          echo "Library linked successfully"
-          ls -la node_modules/ng2-dragula || echo "Symlink verification failed"
-          
-          # Start the dev server in background and capture logs
-          # Use serve-ci target which uses tsconfig.serve.json to import from dist
-          npx nx run demo:serve-ci --port 4200 > demo-server.log 2>&1 &
-          SERVER_PID=$!
-          echo "Server started with PID: $SERVER_PID"
-          
-          # Wait for server to be ready (check for 200 response AND actual HTML content)
-          echo "Waiting for server to be ready with compiled app..."
-          for i in {1..180}; do
-            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 2>/dev/null || echo "000")
-            CONTENT=$(curl -s http://localhost:4200 2>/dev/null || echo "")
-            
-            # Check if we get HTTP 200 AND the response contains the app tag (not just webpack dev server page)
-            if [ "$HTTP_CODE" = "200" ] && echo "$CONTENT" | grep -q "<ex-app" ; then
-              echo "Server is ready after $i seconds (HTTP $HTTP_CODE, app content found)"
-              break
-            fi
-            if [ $i -eq 180 ]; then
-              echo "Server failed to serve app within 180 seconds"
-              echo "Last HTTP code: $HTTP_CODE"
-              echo "Content preview: $(echo "$CONTENT" | head -c 500)"
-              echo "=== Server logs ==="
-              cat demo-server.log
-              kill $SERVER_PID 2>/dev/null || true
-              exit 1
-            fi
-            if [ $((i % 15)) -eq 0 ]; then
-              echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE, content length: ${#CONTENT})"
-            fi
-            sleep 1
-          done
-          
-          # Run Cypress tests
-          echo "Running Cypress tests..."
+          echo "Running Cypress tests against Docker container..."
           cd apps/demo-e2e && npx cypress run --config baseUrl=http://localhost:4200 --spec "src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
           cd ../..
           
-          # Capture server logs
-          echo "=== Capturing server logs ==="
-          kill $SERVER_PID 2>/dev/null || true
-          wait $SERVER_PID 2>/dev/null || true
+          echo "Capturing container logs..."
+          docker logs ng2-dragula-demo > dist/cypress/apps/demo-e2e/logs/demo-server.log 2>&1
           
-          # Save server logs to dist for artifact upload
-          if [ -f demo-server.log ]; then
-            cp demo-server.log dist/cypress/apps/demo-e2e/logs/
-            echo "Server logs saved"
-          else
-            echo "Warning: demo-server.log not found"
-          fi
+          echo "Stopping container..."
+          docker stop ng2-dragula-demo || true
+          docker rm ng2-dragula-demo || true
           
           # Exit with Cypress exit code
           exit ${TEST_EXIT_CODE:-0}
