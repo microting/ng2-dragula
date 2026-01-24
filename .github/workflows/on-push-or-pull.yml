@@ -50,7 +50,7 @@ jobs:
           # Create npm package tarball
           cd dist/ng2-dragula
           echo "Creating package tarball..."
-          npm pack
+          npm pack --ignore-scripts
           echo "Package tarball created:"
           ls -lh *.tgz
           cd ../..
