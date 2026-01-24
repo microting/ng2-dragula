@@ -49,10 +49,14 @@ jobs:
           
           # Create npm package tarball
           cd dist/ng2-dragula
+          echo "Creating package tarball..."
           npm pack
+          echo "Package tarball created:"
+          ls -lh *.tgz
           cd ../..
           
           # Move the tarball to a known location
+          echo "Moving tarball..."
           mv dist/ng2-dragula/*.tgz ng2-dragula.tgz
           echo "Package created: ng2-dragula.tgz"
           ls -lh ng2-dragula.tgz
