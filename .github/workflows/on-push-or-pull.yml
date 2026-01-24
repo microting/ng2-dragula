@@ -47,23 +47,22 @@ jobs:
           npx nx build ng2-dragula
           echo "Library build complete"
           
-          # Verify the build output directory exists
-          echo "Verifying dist directory..."
-          ls -la dist/
+          # Verify the build output directory exists with absolute path
+          echo "Verifying dist directory with absolute path..."
+          ls -lah /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula
           
-          # Create npm package tarball from the dist directory
-          echo "Creating package tarball from dist/ng2-dragula..."
-          cd dist/ng2-dragula
+          # Create npm package tarball from the dist directory using absolute path
+          echo "Creating package tarball from /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula..."
+          cd /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula
           npm pack --ignore-scripts
           echo "Package tarball created:"
           ls -lh *.tgz
-          cd ../..
           
-          # Move the tarball to a known location
+          # Move the tarball to workspace root using absolute path
           echo "Moving tarball to workspace root..."
-          mv dist/ng2-dragula/*.tgz ng2-dragula.tgz
+          mv /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula/*.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
           echo "Package created: ng2-dragula.tgz"
-          ls -lh ng2-dragula.tgz
+          ls -lh /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
       
       - name: Upload ng2-dragula package as artifact
         uses: actions/upload-artifact@v4
