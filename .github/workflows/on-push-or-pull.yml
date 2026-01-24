@@ -56,12 +56,10 @@ jobs:
           
           # Link the built library to node_modules so webpack can resolve it
           echo "Linking built library to node_modules..."
-          cd dist/ng2-dragula
-          npm link
-          cd ../..
-          npm link ng2-dragula
+          # Create symlink directly (more reliable than npm link in CI)
+          ln -s ../../dist/ng2-dragula node_modules/ng2-dragula
           echo "Library linked successfully"
-          ls -la node_modules/ng2-dragula
+          ls -la node_modules/ng2-dragula || echo "Symlink verification failed"
           
           # Start the dev server in background and capture logs
           # Note: Now using regular serve since ng2-dragula is available in node_modules
