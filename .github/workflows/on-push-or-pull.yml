@@ -69,13 +69,16 @@ jobs:
           
           echo ""
           echo "===== Checking possible dist locations ====="
+          # Check the actual Nx output location from project.json
           for dir in \
+            "/home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/ng2-dragula" \
             "/home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula" \
             "/home/runner/work/ng2-dragula/ng2-dragula/dist/libs/ng2-dragula" \
             "/home/runner/work/ng2-dragula/ng2-dragula/dist/packages/ng2-dragula"
           do
-            if [ -d "$dir" ]; then
-              echo "Found: $dir"
+            echo "Checking: $dir"
+            if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
+              echo "✓ Found valid build output: $dir"
               ls -lah "$dir/"
               
               # Create npm package tarball from the found directory
@@ -88,15 +91,19 @@ jobs:
               
               # Move the tarball to workspace root
               echo "Moving tarball to workspace root..."
-              mv "$dir"/*.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
-              echo "Package created: ng2-dragula.tgz"
+              mv *.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
+              echo "✓ Package created: ng2-dragula.tgz"
               ls -lh /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
               exit 0
+            else
+              echo "  ✗ Not found or missing package.json"
             fi
           done
           
+          echo ""
           echo "ERROR: Could not find ng2-dragula build output in any expected location!"
           echo "Checked locations:"
+          echo "  - /home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/ng2-dragula"
           echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula"
           echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/libs/ng2-dragula"
           echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/packages/ng2-dragula"
