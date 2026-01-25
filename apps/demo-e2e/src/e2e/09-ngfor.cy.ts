@@ -15,14 +15,15 @@ describe('Drag & Drop - ngFor Integration', () => {
 
   it('should render ngFor example with dynamically rendered lists', () => {
     // Find containers with dragula attribute in the first wrapper
+    // Using direct attribute selector since [dragula] is a property binding
     cy.get('ex-09-ngfor .wrapper').first().within(() => {
-      cy.get('.container').filter('[dragula]', { timeout: 10000 }).should('have.length', 2);
+      cy.get('.container[dragula]', { timeout: 10000 }).should('have.length', 2);
       
-      cy.get('.container').filter('[dragula]').first()
+      cy.get('.container[dragula]').first()
         .should('be.visible')
         .as('ngForSource');
       
-      cy.get('.container').filter('[dragula]').eq(1)
+      cy.get('.container[dragula]').eq(1)
         .should('be.visible')
         .as('ngForTarget');
     });
@@ -37,8 +38,9 @@ describe('Drag & Drop - ngFor Integration', () => {
 
   it('should maintain ngFor list structure', () => {
     // Find containers with dragula attribute in the first wrapper
+    // Using direct attribute selector since [dragula] is a property binding
     cy.get('ex-09-ngfor .wrapper').first().within(() => {
-      cy.get('.container').filter('[dragula]', { timeout: 10000 }).first()
+      cy.get('.container[dragula]', { timeout: 10000 }).first()
         .should('be.visible')
         .as('list');
     });
