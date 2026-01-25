@@ -68,6 +68,28 @@ jobs:
           find /home/runner/work/ng2-dragula/ng2-dragula/dist -name "package.json" 2>/dev/null || echo "No dist directory or no package.json files found"
           
           echo ""
+          echo "===== Checking if libs/ng2-dragula/dist exists ====="
+          if [ -d "/home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist" ]; then
+            echo "✓ libs/ng2-dragula/dist directory exists"
+            ls -lah /home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/
+          else
+            echo "✗ libs/ng2-dragula/dist directory does NOT exist"
+          fi
+          
+          echo ""
+          echo "===== Checking if dist exists at workspace root ====="
+          if [ -d "/home/runner/work/ng2-dragula/ng2-dragula/dist" ]; then
+            echo "✓ dist directory exists at workspace root"
+            ls -lah /home/runner/work/ng2-dragula/ng2-dragula/dist/
+          else
+            echo "✗ dist directory does NOT exist at workspace root"
+          fi
+          
+          echo ""
+          echo "===== Searching for ALL package.json files ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula -name "package.json" -type f | grep -E "(dist|ng2-dragula)" | head -20
+          
+          echo ""
           echo "===== Checking possible dist locations ====="
           # Check the actual Nx output location from project.json
           for dir in \
@@ -77,26 +99,32 @@ jobs:
             "/home/runner/work/ng2-dragula/ng2-dragula/dist/packages/ng2-dragula"
           do
             echo "Checking: $dir"
-            if [ -d "$dir" ] && [ -f "$dir/package.json" ]; then
-              echo "✓ Found valid build output: $dir"
-              ls -lah "$dir/"
-              
-              # Create npm package tarball from the found directory
-              echo ""
-              echo "Creating package tarball from $dir..."
-              cd "$dir"
-              npm pack --ignore-scripts
-              echo "Package tarball created:"
-              ls -lh *.tgz
-              
-              # Move the tarball to workspace root
-              echo "Moving tarball to workspace root..."
-              mv *.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
-              echo "✓ Package created: ng2-dragula.tgz"
-              ls -lh /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
-              exit 0
+            if [ -d "$dir" ]; then
+              echo "  Directory exists"
+              if [ -f "$dir/package.json" ]; then
+                echo "  ✓ package.json found"
+                echo "  Contents of directory:"
+                ls -lah "$dir/" | head -20
+                
+                # Create npm package tarball from the found directory
+                echo ""
+                echo "Creating package tarball from $dir..."
+                cd "$dir"
+                npm pack --ignore-scripts
+                echo "Package tarball created:"
+                ls -lh *.tgz
+                
+                # Move the tarball to workspace root
+                echo "Moving tarball to workspace root..."
+                mv *.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
+                echo "✓ Package created: ng2-dragula.tgz"
+                ls -lh /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
+                exit 0
+              else
+                echo "  ✗ package.json NOT found"
+              fi
             else
-              echo "  ✗ Not found or missing package.json"
+              echo "  ✗ Directory does not exist"
             fi
           done
           
