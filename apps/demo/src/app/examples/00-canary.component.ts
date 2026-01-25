@@ -3,6 +3,7 @@ import { DragulaService } from "ng2-dragula";
 import { Subscription } from "rxjs";
 
 @Component({
+  standalone: false,
   selector: 'ex-00-canary',
   template: `
 <div class='parent canary-test'>
