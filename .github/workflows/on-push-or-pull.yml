@@ -44,7 +44,8 @@ jobs:
       - name: Build ng2-dragula library and create package
         run: |
           echo "Building ng2-dragula library..."
-          npx nx build ng2-dragula
+          # Force rebuild without cache to ensure dist files are written
+          npx nx build ng2-dragula --skip-nx-cache
           echo "Library build complete"
           
           # Show complete directory structure recursively from workspace root
