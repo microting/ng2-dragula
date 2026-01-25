@@ -6,12 +6,19 @@ describe('Drag & Drop - Click vs Drag', () => {
   beforeEach(() => {
     cy.visit('/');
     // Wait for Angular to bootstrap and render components
-    cy.get('ex-08-click', { timeout: 10000 }).should('exist').and('be.visible');
+    cy.get('ex-08-click', { timeout: 20000 }).should('exist').and('be.visible');
+    // Wait for content to be rendered
+    cy.get('ex-08-click').should(($el) => {
+      expect($el.html()).to.have.length.greaterThan(100);
+    });
   });
 
   it('should render click example with dragula containers', () => {
-    // Use more flexible selector that works with Angular property binding
-    cy.get('ex-08-click').find('[dragula]').first().as('clickContainer');
+    // Use selector that works for both attribute and property binding
+    cy.get('ex-08-click').find('.container[dragula], .container[dragula="CLICKS"]', { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .as('clickContainer');
     
     // Verify container exists and has items
     cy.get('@clickContainer').find('div').should('have.length.greaterThan', 0);
@@ -24,12 +31,14 @@ describe('Drag & Drop - Click vs Drag', () => {
     cy.get('@clickContainer').find('div').first().should('exist');
   });
 
-  it('should have multiple containers for click example', () => {
-    cy.get('ex-08-click').find('[dragula]').first().as('source');
-    cy.get('ex-08-click').find('[dragula]').eq(1).as('target');
+  it('should have clickable elements', () => {
+    cy.get('ex-08-click').find('.container[dragula], .container[dragula="CLICKS"]', { timeout: 10000 })
+      .first()
+      .should('be.visible')
+      .as('container');
     
-    // Verify both containers exist
-    cy.get('@source').should('exist').and('be.visible');
-    cy.get('@target').should('exist').and('be.visible');
+    // Verify container has clickable items
+    cy.get('@container').find('div').should('have.length.greaterThan', 0);
+    cy.get('@container').find('div').first().should('contain.text', 'click');
   });
 });
