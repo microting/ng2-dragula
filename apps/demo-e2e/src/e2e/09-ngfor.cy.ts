@@ -14,17 +14,18 @@ describe('Drag & Drop - ngFor Integration', () => {
   });
 
   it('should render ngFor example with dynamically rendered lists', () => {
-    // Find the wrapper that contains the dragula containers
-    cy.get('ex-09-ngfor').find('.wrapper').first().as('dragulaWrapper');
-    
-    // Get containers with dragula attribute within the first wrapper
-    cy.get('@dragulaWrapper').find('.container[dragula]', { timeout: 10000 }).first()
-      .should('be.visible')
-      .as('ngForSource');
-    
-    cy.get('@dragulaWrapper').find('.container[dragula]').eq(1)
-      .should('be.visible')
-      .as('ngForTarget');
+    // Find containers with dragula attribute in the first wrapper
+    cy.get('ex-09-ngfor .wrapper').first().within(() => {
+      cy.get('.container').filter('[dragula]', { timeout: 10000 }).should('have.length', 2);
+      
+      cy.get('.container').filter('[dragula]').first()
+        .should('be.visible')
+        .as('ngForSource');
+      
+      cy.get('.container').filter('[dragula]').eq(1)
+        .should('be.visible')
+        .as('ngForTarget');
+    });
     
     // ngFor lists should be rendered with items
     cy.get('@ngForSource').find('div').should('have.length.greaterThan', 0);
@@ -36,9 +37,11 @@ describe('Drag & Drop - ngFor Integration', () => {
 
   it('should maintain ngFor list structure', () => {
     // Find containers with dragula attribute in the first wrapper
-    cy.get('ex-09-ngfor').find('.wrapper').first().find('.container[dragula]', { timeout: 10000 }).first()
-      .should('be.visible')
-      .as('list');
+    cy.get('ex-09-ngfor .wrapper').first().within(() => {
+      cy.get('.container').filter('[dragula]', { timeout: 10000 }).first()
+        .should('be.visible')
+        .as('list');
+    });
     
     // Verify list has items and structure is intact
     cy.get('@list').find('div').its('length').then((initialCount) => {

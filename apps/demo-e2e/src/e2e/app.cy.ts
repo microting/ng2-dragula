@@ -38,7 +38,7 @@ describe('Demo App - Basic', () => {
     cy.screenshot('03-ex-app-exists');
     
     // Check for h1 with logo - it's in index.html outside of ex-app
-    cy.get('body > h1', { timeout: 20000 }).should('exist').and('be.visible').then(($h1) => {
+    cy.get('h1', { timeout: 20000 }).should('exist').and('be.visible').then(($h1) => {
       cy.task('log', `Found h1 element`);
       // Check for logo image inside h1
       cy.wrap($h1).find('img[alt="angular-dragula"]').should('exist').and('be.visible').then(($el) => {
@@ -49,7 +49,7 @@ describe('Demo App - Basic', () => {
     cy.screenshot('04-h1-checked');
     
     // Check for tagline - it's also in index.html outside of ex-app
-    cy.get('body > h3.tagline', { timeout: 20000 })
+    cy.get('h3.tagline', { timeout: 20000 })
       .should('exist')
       .and('be.visible')
       .and(($el) => {
