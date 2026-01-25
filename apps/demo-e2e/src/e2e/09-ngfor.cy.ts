@@ -5,23 +5,25 @@
 describe('Drag & Drop - ngFor Integration', () => {
   beforeEach(() => {
     cy.visit('/');
-    cy.get('ex-09-ngfor').should('exist');
+    // Wait for Angular to bootstrap and render components
+    cy.get('ex-09-ngfor', { timeout: 10000 }).should('exist').and('be.visible');
   });
 
   it('should render ngFor example with dynamically rendered lists', () => {
-    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').first().as('ngForSource');
-    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').eq(1).as('ngForTarget');
+    // Use more flexible selector that works with Angular property binding
+    cy.get('ex-09-ngfor').find('[dragula]').first().as('ngForSource');
+    cy.get('ex-09-ngfor').find('[dragula]').eq(1).as('ngForTarget');
     
     // ngFor lists should be rendered with items
     cy.get('@ngForSource').find('div').should('have.length.greaterThan', 0);
-    cy.get('@ngForTarget').should('exist');
+    cy.get('@ngForTarget').should('exist').and('be.visible');
     
     // Verify items have content
     cy.get('@ngForSource').find('div').first().invoke('text').should('not.be.empty');
   });
 
   it('should maintain ngFor list structure', () => {
-    cy.get('ex-09-ngfor [dragula="MANY_ITEMS"]').first().as('list');
+    cy.get('ex-09-ngfor').find('[dragula]').first().as('list');
     
     // Verify list has items and structure is intact
     cy.get('@list').find('div').its('length').then((initialCount) => {

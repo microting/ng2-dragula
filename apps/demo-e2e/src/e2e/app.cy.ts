@@ -28,19 +28,19 @@ describe('Demo App - Basic', () => {
     cy.get('body').should('exist');
     cy.screenshot('02-checking-ex-app');
     
-    cy.get('ex-app').should('exist').then(($el) => {
+    cy.get('ex-app', { timeout: 10000 }).should('exist').and('be.visible').then(($el) => {
       cy.task('log', `Found ex-app element with ${$el.length} match(es)`);
     });
     
     cy.screenshot('03-ex-app-exists');
     
-    cy.get('h1 img[alt="angular-dragula"]').should('exist').then(($el) => {
+    cy.get('h1 img[alt="angular-dragula"]', { timeout: 10000 }).should('exist').and('be.visible').then(($el) => {
       cy.task('log', `Found h1 with logo image alt="${$el.attr('alt')}"`);
     });
     
     cy.screenshot('04-h1-checked');
     
-    cy.get('h3.tagline').should('contain', 'Drag and drop so simple it hurts').then(($el) => {
+    cy.get('h3.tagline', { timeout: 10000 }).should('be.visible').and('contain', 'Drag and drop so simple it hurts').then(($el) => {
       cy.task('log', `Found tagline with text: ${$el.text()}`);
     });
     
