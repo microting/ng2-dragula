@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from "@angular/core";
+import { Component, OnInit, OnDestroy, AfterViewInit, ElementRef } from "@angular/core";
 import { DragulaService } from "ng2-dragula";
 import { Subscription } from "rxjs";
 
@@ -13,6 +13,8 @@ import { Subscription } from "rxjs";
     <ul>
       <li>DragulaService loaded: <strong>{{ dragulaServiceLoaded ? '✅ YES' : '❌ NO' }}</strong></li>
       <li>Component initialized: <strong>{{ componentInitialized ? '✅ YES' : '❌ NO' }}</strong></li>
+      <li>View initialized: <strong>{{ viewInitialized ? '✅ YES' : '❌ NO' }}</strong></li>
+      <li>Template rendered: <strong>{{ templateRendered ? '✅ YES' : '❌ NO' }}</strong></li>
       <li>Drag group created: <strong>{{ dragGroupCreated ? '✅ YES' : '❌ NO' }}</strong></li>
       <li>Drag events subscribed: <strong>{{ eventsSubscribed ? '✅ YES' : '❌ NO' }}</strong></li>
       <li>Last event: <strong>{{ lastEvent || 'None yet' }}</strong></li>
@@ -127,9 +129,11 @@ import { Subscription } from "rxjs";
     }
   `]
 })
-export class CanaryComponent implements OnInit, OnDestroy {
+export class CanaryComponent implements OnInit, OnDestroy, AfterViewInit {
   dragulaServiceLoaded = false;
   componentInitialized = false;
+  viewInitialized = false;
+  templateRendered = false;
   dragGroupCreated = false;
   eventsSubscribed = false;
   lastEvent = '';
@@ -138,9 +142,10 @@ export class CanaryComponent implements OnInit, OnDestroy {
   
   private subs = new Subscription();
 
-  constructor(private dragulaService: DragulaService) {
+  constructor(private dragulaService: DragulaService, private elementRef: ElementRef) {
     this.dragulaServiceLoaded = !!dragulaService;
     this.log('Constructor: DragulaService injection ' + (this.dragulaServiceLoaded ? 'SUCCESS' : 'FAILED'));
+    this.log('ElementRef: ' + (elementRef ? 'AVAILABLE' : 'NOT AVAILABLE'));
   }
 
   ngOnInit() {
@@ -177,6 +182,22 @@ export class CanaryComponent implements OnInit, OnDestroy {
     } catch (e: any) {
       this.log('ERROR subscribing to events: ' + e.message);
       this.eventsSubscribed = false;
+    }
+  }
+
+  ngAfterViewInit() {
+    this.viewInitialized = true;
+    this.log('ngAfterViewInit: View initialized');
+    
+    // Check if template actually rendered
+    const element = this.elementRef.nativeElement;
+    const hasContent = element && element.innerHTML && element.innerHTML.length > 100;
+    this.templateRendered = hasContent;
+    this.log(`Template rendered check: ${hasContent ? 'YES' : 'NO'} (HTML length: ${element?.innerHTML?.length || 0})`);
+    
+    if (!hasContent) {
+      this.log('WARNING: Template does not appear to be rendered properly!');
+      console.error('[Canary] Template rendering issue detected. Element:', element);
     }
   }
 
