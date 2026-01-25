@@ -195,11 +195,30 @@ jobs:
           docker load < demo-image.tar.gz
           
           echo "Starting demo container..."
-          docker run -d --name ng2-dragula-demo -p 4200:4200 ng2-dragula-demo:test
+          CONTAINER_ID=$(docker run -d --name ng2-dragula-demo -p 4200:4200 ng2-dragula-demo:test)
+          echo "Container ID: $CONTAINER_ID"
           
-          echo "Waiting for container to be healthy..."
-          sleep 5
-          docker ps
+          echo "Waiting for container to start..."
+          sleep 3
+          
+          # Check if container is still running
+          echo "=== Container status ==="
+          docker ps -a | grep ng2-dragula-demo || true
+          
+          # Get initial logs immediately
+          echo "=== Initial container logs (first 50 lines) ==="
+          docker logs ng2-dragula-demo 2>&1 | head -50 || true
+          
+          # Check if container exited
+          CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' ng2-dragula-demo 2>/dev/null || echo "not_found")
+          echo "Container status: $CONTAINER_STATUS"
+          
+          if [ "$CONTAINER_STATUS" != "running" ]; then
+            echo "ERROR: Container is not running (status: $CONTAINER_STATUS)"
+            echo "=== Full container logs ==="
+            docker logs ng2-dragula-demo 2>&1
+            exit 1
+          fi
           
           # Wait for server to be ready (check for 200 response AND actual HTML content)
           echo "Waiting for demo app to be ready..."
@@ -217,11 +236,16 @@ jobs:
               echo "Last HTTP code: $HTTP_CODE"
               echo "Content preview: $(echo "$CONTENT" | head -c 500)"
               echo "=== Container logs ==="
-              docker logs ng2-dragula-demo
+              docker logs ng2-dragula-demo 2>&1
               exit 1
             fi
             if [ $((i % 15)) -eq 0 ]; then
               echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE)"
+              # Show recent logs every 30 seconds
+              if [ $((i % 30)) -eq 0 ]; then
+                echo "=== Recent container logs (last 20 lines) ==="
+                docker logs --tail 20 ng2-dragula-demo 2>&1 || true
+              fi
             fi
             sleep 1
           done
