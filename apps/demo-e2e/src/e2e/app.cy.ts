@@ -69,13 +69,27 @@ describe('Demo App - Basic', () => {
     // Take full page screenshot
     cy.screenshot('06-full-page-examples', { capture: 'fullPage' });
     
-    // Verify all 10 example sections are present
-    const examples = ['Basic', 'Events', 'Spill', 'Revert', 'Copy', 'Handle', 'Click', 'ngFor', 'Nested'];
+    // Verify all 11 example component selectors are present (including canary)
+    const exampleSelectors = [
+      'ex-00-canary',
+      'ex-01-basic',
+      'ex-02-events', 
+      'ex-03-spill',
+      'ex-04-revert',
+      'ex-05-copy',
+      'ex-06-copy-model',
+      'ex-07-handle',
+      'ex-08-click',
+      'ex-09-ngfor',
+      'ex-10-nested'
+    ];
     
-    examples.forEach((example) => {
-      cy.task('log', `Looking for example: ${example}`);
-      cy.contains(example).should('exist').then(($el) => {
-        cy.task('log', `Found ${example} at position: top=${$el.offset()?.top}, left=${$el.offset()?.left}`);
+    exampleSelectors.forEach((selector) => {
+      cy.task('log', `Looking for component: ${selector}`);
+      cy.get(selector, { timeout: 10000 }).should('exist').and('be.visible').then(($el) => {
+        cy.task('log', `Found ${selector} with HTML length: ${$el.html().length}`);
+        // Verify component has rendered content
+        expect($el.html()).to.have.length.greaterThan(50);
       });
     });
     
