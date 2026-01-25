@@ -27,6 +27,10 @@ COPY tsconfig.base.json ./
 # Copy demo app source files and project configuration
 COPY apps/demo ./apps/demo
 
+# Remove implicit dependency on ng2-dragula from project.json
+# since it's installed as an npm package, not a workspace project
+RUN sed -i '/"implicitDependencies":/d' ./apps/demo/project.json
+
 # Expose port for dev server
 EXPOSE 4200
 
