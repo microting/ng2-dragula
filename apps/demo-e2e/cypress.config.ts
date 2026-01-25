@@ -16,7 +16,10 @@ export default defineConfig({
     trashAssetsBeforeRuns: true,
     viewportWidth: 1280,
     viewportHeight: 720,
-    defaultCommandTimeout: 10000,
+    defaultCommandTimeout: 30000, // Increase timeout for Docker-based CI
+    pageLoadTimeout: 60000, // Increase page load timeout
+    requestTimeout: 30000, // Increase request timeout
+    responseTimeout: 30000, // Increase response timeout
     // Add setup for better debugging
     setupNodeEvents(on, config) {
       const logsDir = path.join(__dirname, '../../dist/cypress/apps/demo-e2e/logs');
