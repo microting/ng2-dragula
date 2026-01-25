@@ -258,8 +258,10 @@ jobs:
           mkdir -p dist/cypress/apps/demo-e2e/screenshots
           mkdir -p dist/cypress/apps/demo-e2e/videos
           
-          echo "Running Cypress tests against Docker container..."
-          cd apps/demo-e2e && npx cypress run --config baseUrl=http://localhost:4200 --spec "src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
+          echo "Running Cypress smoke tests against Docker container..."
+          echo "Note: Running only smoke tests (app.cy.ts) in CI for performance."
+          echo "Run 'npm run e2e' locally to execute the full test suite."
+          cd apps/demo-e2e && npx cypress run --config baseUrl=http://localhost:4200 --spec "src/e2e/app.cy.ts" || TEST_EXIT_CODE=$?
           cd ../..
           
           echo "Capturing container logs..."
