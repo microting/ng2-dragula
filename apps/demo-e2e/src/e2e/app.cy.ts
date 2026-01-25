@@ -37,18 +37,21 @@ describe('Demo App - Basic', () => {
     
     cy.screenshot('03-ex-app-exists');
     
-    // Check for h1 with more flexible selector and retry logic
-    cy.get('h1', { timeout: 20000 }).should('exist').and('be.visible').within(() => {
-      cy.get('img[alt="angular-dragula"]').should('exist').and('be.visible').then(($el) => {
-        cy.task('log', `Found h1 with logo image alt="${$el.attr('alt')}"`);
+    // Check for h1 with logo - it's in index.html outside of ex-app
+    cy.get('body > h1', { timeout: 20000 }).should('exist').and('be.visible').then(($h1) => {
+      cy.task('log', `Found h1 element`);
+      // Check for logo image inside h1
+      cy.wrap($h1).find('img[alt="angular-dragula"]').should('exist').and('be.visible').then(($el) => {
+        cy.task('log', `Found logo image with alt="${$el.attr('alt')}"`);
       });
     });
     
     cy.screenshot('04-h1-checked');
     
-    // Check for tagline with more retries
-    cy.get('h3.tagline, h3', { timeout: 20000 })
-      .should('be.visible')
+    // Check for tagline - it's also in index.html outside of ex-app
+    cy.get('body > h3.tagline', { timeout: 20000 })
+      .should('exist')
+      .and('be.visible')
       .and(($el) => {
         const text = $el.text();
         expect(text.toLowerCase()).to.include('drag');
