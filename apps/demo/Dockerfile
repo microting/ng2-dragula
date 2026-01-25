@@ -10,8 +10,8 @@ WORKDIR /app
 # Copy package files for demo app dependencies
 COPY package.json package-lock.json ./
 
-# Install dependencies (production only for smaller image)
-RUN npm ci --production=false
+# Install dependencies (use legacy-peer-deps to bypass peer dependency conflicts)
+RUN npm ci --legacy-peer-deps
 
 # Copy the pre-built ng2-dragula package from artifact
 # This will be mounted as a volume or copied in the workflow
