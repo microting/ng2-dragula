@@ -17,8 +17,8 @@ RUN npm ci --legacy-peer-deps
 # This will be mounted as a volume or copied in the workflow
 COPY ng2-dragula.tgz /tmp/ng2-dragula.tgz
 
-# Install the local package
-RUN npm install /tmp/ng2-dragula.tgz
+# Install the local package (use legacy-peer-deps to bypass peer dependency conflicts)
+RUN npm install /tmp/ng2-dragula.tgz --legacy-peer-deps
 
 # Copy demo app source files
 COPY apps/demo ./apps/demo
