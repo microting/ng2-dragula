@@ -23,13 +23,9 @@ RUN npm install /tmp/ng2-dragula.tgz --legacy-peer-deps
 # Copy Nx workspace configuration files
 COPY nx.json ./
 COPY tsconfig.base.json ./
-COPY .nxignore ./ 2>/dev/null || :
 
 # Copy demo app source files and project configuration
 COPY apps/demo ./apps/demo
-
-# Copy demo-e2e if exists (for reference)
-COPY apps/demo-e2e ./apps/demo-e2e 2>/dev/null || :
 
 # Expose port for dev server
 EXPOSE 4200
