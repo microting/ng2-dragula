@@ -22,6 +22,7 @@ export class HandleComponent {
 
 @Component({
   selector: 'ex-07-handle',
+  standalone: false,
   templateUrl: './07-handle.component.html',
   styles: [`
   .container div {

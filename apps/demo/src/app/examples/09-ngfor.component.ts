@@ -49,6 +49,7 @@ export class NgForComponent {
 
 @Component({
   selector: 'ex-09-ngfor',
+  standalone: false,
   templateUrl: './09-ngfor.component.html',
   styles: [`
   .container { min-width: 200px; }

@@ -36,6 +36,7 @@ export class NestedComponent {
 
 @Component({
   selector: 'ex-10-nested',
+  standalone: false,
   templateUrl: './10-nested.component.html',
   styles: [`
   .container span {

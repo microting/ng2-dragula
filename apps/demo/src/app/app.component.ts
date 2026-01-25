@@ -2,6 +2,7 @@ import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'ex-app',
+  standalone: false,
   template: `
     <div class="examples">
       <ex-00-canary></ex-00-canary>

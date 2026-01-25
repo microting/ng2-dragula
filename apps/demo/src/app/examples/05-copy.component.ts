@@ -26,6 +26,7 @@ export class CopyComponent {
 
 @Component({
   selector: 'ex-05-copy',
+  standalone: false,
   templateUrl: './05-copy.component.html'
 })
 export class CopyComponent {
