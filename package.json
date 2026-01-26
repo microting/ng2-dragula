@@ -52,7 +52,7 @@
     "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.7.1",
-    "@typescript-eslint/eslint-plugin": "^6.13.2",
+    "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^6.13.2",
     "codecov": "^3.8.2",
     "conventional-changelog-cli": "^2.1.1",
