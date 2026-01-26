@@ -60,7 +60,7 @@
     "cypress": "15.9.0",
     "dragula": "^3.7.2",
     "eslint": "^8.15.0",
-    "eslint-config-prettier": "^9.0.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-cypress": "^2.12.1",
     "fs-extra": "^11.3.0",
     "jest": "^29.6.1",
