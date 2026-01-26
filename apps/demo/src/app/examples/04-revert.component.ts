@@ -15,6 +15,7 @@ export class RevertComponent {
 
 @Component({
   selector: 'ex-04-revert',
+  standalone: false,
   templateUrl: './04-revert.component.html'
 })
 export class RevertComponent {

@@ -45,6 +45,7 @@ export class EventsComponent {
 
 @Component({
   selector: 'ex-02-events',
+  standalone: false,
   templateUrl: './02-events.component.html'
 })
 export class EventsComponent {

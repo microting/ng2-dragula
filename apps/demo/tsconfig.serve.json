@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "../../dist/out-tsc",
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    "target": "ES2022",
+    "useDefineForClassFields": false,
+    "moduleResolution": "node",
+    "baseUrl": "../../",
+    "paths": {
+      "ng2-dragula": [
+        "dist/ng2-dragula"
+      ]
+    }
+  },
+  "exclude": ["src/test.ts", "**/*.spec.ts"],
+  "files": ["./src/main.ts", "./src/polyfills.ts"],
+  "include": ["./src/typings.d.ts"]
+}

@@ -2,8 +2,10 @@ import { Component, ViewEncapsulation } from '@angular/core';
 
 @Component({
   selector: 'ex-app',
+  standalone: false,
   template: `
     <div class="examples">
+      <ex-00-canary></ex-00-canary>
       <ex-01-basic></ex-01-basic>
       <ex-02-events></ex-02-events>
       <ex-03-spill></ex-03-spill>

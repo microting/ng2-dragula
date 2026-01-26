@@ -3,6 +3,7 @@ import { DragulaService } from "ng2-dragula";
 
 @Component({
   selector: 'ex-01-basic',
+  standalone: false,
   template: `
 <div class='parent'>
   <label for='hy'>Move stuff between these two containers. Note how the stuff gets inserted near the mouse pointer?

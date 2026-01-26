@@ -4,6 +4,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { DragulaModule, DragulaService } from 'ng2-dragula';
 import { DemoComponent } from './app.component';
+import { CanaryComponent } from './examples/00-canary.component';
 import { BasicComponent } from './examples/01-basic.component';
 import { EventsComponent } from './examples/02-events.component';
 import { SpillComponent } from './examples/03-spill.component';
@@ -15,9 +16,14 @@ import { ClickComponent } from './examples/08-click.component';
 import { NgForComponent } from './examples/09-ngfor.component';
 import { NestedComponent } from './examples/10-nested.component';
 
+console.log('[APP MODULE] Loading DragulaDemoModule...');
+console.log('[APP MODULE] DragulaModule:', DragulaModule);
+console.log('[APP MODULE] DragulaService:', DragulaService);
+
 @NgModule({
   declarations: [
     DemoComponent,
+    CanaryComponent,
     BasicComponent,
     EventsComponent,
     SpillComponent,
@@ -40,4 +46,7 @@ import { NestedComponent } from './examples/10-nested.component';
 })
 
 export class DragulaDemoModule {
+  constructor() {
+    console.log('[APP MODULE] ✅ DragulaDemoModule constructed successfully');
+  }
 }

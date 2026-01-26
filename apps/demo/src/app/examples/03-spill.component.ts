@@ -15,6 +15,7 @@ export class SpillComponent {
 
 @Component({
   selector: 'ex-03-spill',
+  standalone: false,
   templateUrl: './03-spill.component.html'
 })
 export class SpillComponent {

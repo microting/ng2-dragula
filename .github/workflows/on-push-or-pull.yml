@@ -33,3 +33,309 @@ jobs:
       - uses: actions/checkout@v3
       - run: yarn install
       - run: npm run lint
+
+  # Step 1: Build and package ng2-dragula library
+  build_package:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
+      - name: Build ng2-dragula library and create package
+        run: |
+          echo "Building ng2-dragula library..."
+          # Force rebuild without cache to ensure dist files are written
+          npx nx build ng2-dragula --skip-nx-cache
+          echo "Library build complete"
+          
+          # Show complete directory structure recursively from workspace root
+          echo "===== Recursive directory listing from workspace root ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula -maxdepth 3 -type d | sort
+          
+          echo ""
+          echo "===== Looking for dist directories ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula -type d -name "dist"
+          
+          echo ""
+          echo "===== Looking for any ng2-dragula directories ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula -type d -name "ng2-dragula"
+          
+          echo ""
+          echo "===== Detailed listing of workspace root ====="
+          ls -lah /home/runner/work/ng2-dragula/ng2-dragula/
+          
+          echo ""
+          echo "===== Looking for package.json files in dist ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula/dist -name "package.json" 2>/dev/null || echo "No dist directory or no package.json files found"
+          
+          echo ""
+          echo "===== Checking if libs/ng2-dragula/dist exists ====="
+          if [ -d "/home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist" ]; then
+            echo "✓ libs/ng2-dragula/dist directory exists"
+            ls -lah /home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/
+          else
+            echo "✗ libs/ng2-dragula/dist directory does NOT exist"
+          fi
+          
+          echo ""
+          echo "===== Checking if dist exists at workspace root ====="
+          if [ -d "/home/runner/work/ng2-dragula/ng2-dragula/dist" ]; then
+            echo "✓ dist directory exists at workspace root"
+            ls -lah /home/runner/work/ng2-dragula/ng2-dragula/dist/
+          else
+            echo "✗ dist directory does NOT exist at workspace root"
+          fi
+          
+          echo ""
+          echo "===== Searching for ALL package.json files ====="
+          find /home/runner/work/ng2-dragula/ng2-dragula -name "package.json" -type f | grep -E "(dist|ng2-dragula)" | head -20
+          
+          echo ""
+          echo "===== Checking possible dist locations ====="
+          # Check the actual Nx output location from project.json
+          for dir in \
+            "/home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/ng2-dragula" \
+            "/home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula" \
+            "/home/runner/work/ng2-dragula/ng2-dragula/dist/libs/ng2-dragula" \
+            "/home/runner/work/ng2-dragula/ng2-dragula/dist/packages/ng2-dragula"
+          do
+            echo "Checking: $dir"
+            if [ -d "$dir" ]; then
+              echo "  Directory exists"
+              if [ -f "$dir/package.json" ]; then
+                echo "  ✓ package.json found"
+                echo "  Contents of directory:"
+                ls -lah "$dir/" | head -20
+                
+                # Create npm package tarball from the found directory
+                echo ""
+                echo "Creating package tarball from $dir..."
+                cd "$dir"
+                npm pack --ignore-scripts
+                echo "Package tarball created:"
+                ls -lh *.tgz
+                
+                # Move the tarball to workspace root
+                echo "Moving tarball to workspace root..."
+                mv *.tgz /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
+                echo "✓ Package created: ng2-dragula.tgz"
+                ls -lh /home/runner/work/ng2-dragula/ng2-dragula/ng2-dragula.tgz
+                exit 0
+              else
+                echo "  ✗ package.json NOT found"
+              fi
+            else
+              echo "  ✗ Directory does not exist"
+            fi
+          done
+          
+          echo ""
+          echo "ERROR: Could not find ng2-dragula build output in any expected location!"
+          echo "Checked locations:"
+          echo "  - /home/runner/work/ng2-dragula/ng2-dragula/libs/ng2-dragula/dist/ng2-dragula"
+          echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/ng2-dragula"
+          echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/libs/ng2-dragula"
+          echo "  - /home/runner/work/ng2-dragula/ng2-dragula/dist/packages/ng2-dragula"
+          exit 1
+      
+      - name: Upload ng2-dragula package as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ng2-dragula-package
+          path: ng2-dragula.tgz
+          retention-days: 1
+  
+  # Step 2: Build Docker image for demo app
+  build_demo_image:
+    runs-on: ubuntu-latest
+    needs: build_package
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Download ng2-dragula package
+        uses: actions/download-artifact@v4
+        with:
+          name: ng2-dragula-package
+      
+      - name: Build Docker image for demo
+        run: |
+          echo "Building Docker image for demo app..."
+          docker build -f apps/demo/Dockerfile -t ng2-dragula-demo:test .
+          echo "Docker image built successfully"
+          
+          # Save the image as a tarball
+          docker save ng2-dragula-demo:test | gzip > demo-image.tar.gz
+          echo "Docker image saved"
+          ls -lh demo-image.tar.gz
+      
+      - name: Upload demo Docker image as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-docker-image
+          path: demo-image.tar.gz
+          retention-days: 1
+  
+  # Step 3: Run Cypress e2e tests against Docker container
+  e2e_tests:
+    runs-on: ubuntu-latest
+    needs: build_demo_image
+    timeout-minutes: 60  # Allow time for all e2e tests through Docker
+    steps:
+      - uses: actions/checkout@v3
+      - run: yarn install
+      - run: npx cypress install
+      
+      - name: Download demo Docker image
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-docker-image
+      
+      - name: Load Docker image and start container
+        run: |
+          echo "Loading Docker image..."
+          docker load < demo-image.tar.gz
+          
+          echo "Starting demo container..."
+          CONTAINER_ID=$(docker run -d --name ng2-dragula-demo -p 4200:4200 ng2-dragula-demo:test)
+          echo "Container ID: $CONTAINER_ID"
+          
+          echo "Waiting for container to start..."
+          sleep 3
+          
+          # Check if container is still running
+          echo "=== Container status ==="
+          docker ps -a | grep ng2-dragula-demo || true
+          
+          # Get initial logs immediately
+          echo "=== Initial container logs (first 50 lines) ==="
+          docker logs ng2-dragula-demo 2>&1 | head -50 || true
+          
+          # Check if container exited
+          CONTAINER_STATUS=$(docker inspect -f '{{.State.Status}}' ng2-dragula-demo 2>/dev/null || echo "not_found")
+          echo "Container status: $CONTAINER_STATUS"
+          
+          if [ "$CONTAINER_STATUS" != "running" ]; then
+            echo "ERROR: Container is not running (status: $CONTAINER_STATUS)"
+            echo "=== Full container logs ==="
+            docker logs ng2-dragula-demo 2>&1
+            exit 1
+          fi
+          
+          # Wait for server to be ready (check for 200 response AND actual HTML content)
+          echo "Waiting for demo app to be ready..."
+          for i in {1..180}; do
+            HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:4200 2>/dev/null || echo "000")
+            CONTENT=$(curl -s http://localhost:4200 2>/dev/null || echo "")
+            
+            # Check if we get HTTP 200 AND the response contains the app tag
+            if [ "$HTTP_CODE" = "200" ] && echo "$CONTENT" | grep -q "<ex-app" ; then
+              echo "Demo app is ready after $i seconds (HTTP $HTTP_CODE)"
+              break
+            fi
+            if [ $i -eq 180 ]; then
+              echo "Demo app failed to start within 180 seconds"
+              echo "Last HTTP code: $HTTP_CODE"
+              echo "Content preview: $(echo "$CONTENT" | head -c 500)"
+              echo "=== Container logs ==="
+              docker logs ng2-dragula-demo 2>&1
+              exit 1
+            fi
+            if [ $((i % 15)) -eq 0 ]; then
+              echo "Still waiting... ($i seconds, HTTP code: $HTTP_CODE)"
+              # Show recent logs every 30 seconds
+              if [ $((i % 30)) -eq 0 ]; then
+                echo "=== Recent container logs (last 20 lines) ==="
+                docker logs --tail 20 ng2-dragula-demo 2>&1 || true
+              fi
+            fi
+            sleep 1
+          done
+      
+      - name: Run Cypress e2e tests
+        run: |
+          # Create log directories
+          mkdir -p dist/cypress/apps/demo-e2e/logs
+          mkdir -p dist/cypress/apps/demo-e2e/screenshots
+          mkdir -p dist/cypress/apps/demo-e2e/videos
+          
+          echo "Running Cypress e2e tests against Docker container..."
+          echo "Optimizations for CI: video=false to improve performance"
+          cd apps/demo-e2e && npx cypress run \
+            --config baseUrl=http://localhost:4200,video=false,screenshotOnRunFailure=true \
+            --spec "src/e2e/**/*.cy.ts" || TEST_EXIT_CODE=$?
+          cd ../..
+          
+          echo "Capturing container logs..."
+          docker logs ng2-dragula-demo > dist/cypress/apps/demo-e2e/logs/demo-server.log 2>&1
+          
+          echo "Stopping container..."
+          docker stop ng2-dragula-demo || true
+          docker rm ng2-dragula-demo || true
+          
+          # Exit with Cypress exit code
+          exit ${TEST_EXIT_CODE:-0}
+      
+      # Upload screenshots on failure
+      - name: Upload Cypress screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-screenshots
+          path: dist/cypress/apps/demo-e2e/screenshots
+          if-no-files-found: ignore
+          retention-days: 7
+      
+      # Upload videos
+      - name: Upload Cypress videos
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-videos
+          path: dist/cypress/apps/demo-e2e/videos
+          if-no-files-found: ignore
+          retention-days: 7
+      
+      # Upload Cypress logs
+      - name: Upload Cypress logs
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cypress-logs
+          path: |
+            dist/cypress/apps/demo-e2e/**/*.log
+            dist/cypress/apps/demo-e2e/**/*.json
+          if-no-files-found: ignore
+          retention-days: 7
+      
+      # Print logs to console for easier debugging
+      - name: Print logs to console
+        if: always()
+        run: |
+          echo "========================================"
+          echo "=== DEMO SERVER LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/demo-server.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/demo-server.log
+          else
+            echo "No demo-server.log found"
+          fi
+          
+          echo ""
+          echo "========================================"
+          echo "=== BROWSER CONSOLE LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/browser-console.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/browser-console.log
+          else
+            echo "No browser-console.log found"
+          fi
+          
+          echo ""
+          echo "========================================"
+          echo "=== TEST EXECUTION LOGS ==="
+          echo "========================================"
+          if [ -f dist/cypress/apps/demo-e2e/logs/test-execution.log ]; then
+            cat dist/cypress/apps/demo-e2e/logs/test-execution.log
+          else
+            echo "No test-execution.log found"
+          fi

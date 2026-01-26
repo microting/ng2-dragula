@@ -4,7 +4,10 @@ import { DrakeWithModels } from '../DrakeWithModels';
 import { Subscription } from 'rxjs';
 import { Group } from '../Group';
 
-@Directive({selector: '[dragula]'})
+@Directive({
+  selector: '[dragula]',
+  standalone: false // eslint-disable-line @angular-eslint/prefer-standalone
+})
 export class DragulaDirective implements OnChanges, OnDestroy {
   @Input() public dragula?: string;
   @Input() public dragulaModel?: any[];

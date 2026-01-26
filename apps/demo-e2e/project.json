@@ -1,0 +1,29 @@
+{
+  "name": "demo-e2e",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/demo-e2e/src",
+  "targets": {
+    "e2e": {
+      "executor": "@nx/cypress:cypress",
+      "options": {
+        "cypressConfig": "apps/demo-e2e/cypress.config.ts",
+        "devServerTarget": "demo:serve",
+        "testingType": "e2e"
+      },
+      "configurations": {
+        "production": {
+          "devServerTarget": "demo:serve:production"
+        },
+        "ci": {
+          "devServerTarget": "demo:serve",
+          "record": false,
+          "browser": "chrome",
+          "headless": true
+        }
+      }
+    }
+  },
+  "tags": [],
+  "implicitDependencies": ["demo"]
+}

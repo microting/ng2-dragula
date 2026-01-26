@@ -38,6 +38,7 @@ type Key = {
 
 @Component({
   selector: 'ex-08-click',
+  standalone: false,
   templateUrl: './08-click.component.html',
   styles: [`
   .container div {
